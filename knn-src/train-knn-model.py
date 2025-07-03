@@ -1,11 +1,11 @@
 import os
 import pandas as pd
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 
-# --- 1. Data Preparation ---
+#Data Preparation
 
 # Load your data from the CSV file located in the 'data' folder
 try:
@@ -38,39 +38,65 @@ print(f"Testing data shape: {X_test.shape}")
 print("-" * 30)
 
 
-# --- 2. Model Initialization ---
+#Hyperparameter Tuning with Grid Search
 
 # Create a K-Nearest Neighbors Regressor model instance
-# n_neighbors: Number of neighbors to use. A common starting point is 5.
-knn = KNeighborsRegressor(n_neighbors=5, n_jobs=-1)
-# n_jobs=-1 uses all available CPU cores for training, which can speed it up.
+knn = KNeighborsRegressor(n_jobs=-1)
+
+# Define the parameter grid to search
+# We'll search for the best number of neighbors, weight function, and distance metric.
+param_grid = {
+    'n_neighbors': range(1, 31),  # Test k from 1 to 30
+    'weights': ['uniform', 'distance'],
+    'metric': ['euclidean', 'manhattan', 'minkowski']
+}
+
+# Create a GridSearchCV object
+# cv=5 means 5-fold cross-validation.
+# scoring='r2' will optimize for the best R-squared score.
+grid_search = GridSearchCV(
+    estimator=knn,
+    param_grid=param_grid,
+    cv=5,
+    scoring='r2',
+    verbose=1  # To see the progress
+)
 
 
-# --- 3. Model Training ---
+#Model Training
 
-print("Training the K-Nearest Neighbors Regressor...")
-# Fit the model to the training data
-knn.fit(X_train, y_train)
-print("Training complete.")
+print("Running Grid Search to find the best hyperparameters...")
+# Fit the grid search to the training data
+grid_search.fit(X_train, y_train)
+print("Grid Search complete.")
+print("-" * 30)
+
+# Get the best model from the grid search
+best_knn = grid_search.best_estimator_
+
+# Print the best parameters found
+print("Best Hyperparameters Found:")
+print(grid_search.best_params_)
 print("-" * 30)
 
 
-# --- 4. Model Evaluation ---
+#Model Evaluation
 
-# Use the trained model to make predictions on the test set
-y_pred = knn.predict(X_test)
+#Use the best model to make predictions on the test set
+y_pred = best_knn.predict(X_test)
 
 #Calculate the Mean Squared Error and R-squared score
 mse = mean_squared_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
 
-print("Model Evaluation:")
+print("Evaluation of the Best Model:")
 print(f"Mean Squared Error (MSE): {mse:.4f}")
 print(f"R-squared (R²) Score: {r2:.4f}")
 
-#Saving model iteration
+#Saving the best model
 output_dir = "models"
+os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
 model_filename = os.path.join(output_dir, "knn_model.joblib")
-joblib.dump(knn, model_filename)
-print(f"Model saved to {model_filename}")
+joblib.dump(best_knn, model_filename)
+print(f"\nBest model saved to {model_filename}")
 print("-" * 30)
