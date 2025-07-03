@@ -2,7 +2,7 @@ import pandas as pd
 import joblib
 import os
 
-# --- 1. LOAD THE TRAINED MODEL ---
+#LOAD THE TRAINED MODEL
 
 MODEL_PATH = os.path.join("models", "knn_model.joblib")
 
@@ -21,7 +21,7 @@ def load_model(path):
         return None
 
 
-# --- 2. PREDICT ON NEW DATA ---
+#PREDICT ON NEW DATA
 
 def predict_stress(model, input_data):
     """
@@ -45,7 +45,7 @@ def predict_stress(model, input_data):
         return None
 
 
-# --- 3. SCRIPT EXECUTION ---
+#SCRIPT EXECUTION
 
 def main():
     """Main function to run the prediction script."""

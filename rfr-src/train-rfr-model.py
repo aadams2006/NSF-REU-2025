@@ -6,7 +6,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 import os
 import joblib
 
-# --- DATA PREPARATION ---
+# Data preprocessing
 
 # Load data from CSV file
 try:
@@ -46,16 +46,6 @@ param_grid_rfr = {
     'min_samples_leaf': [1, 2]
 }
 
-# To add other models, define their parameter grids and add them to this list.
-# For example:
-# from sklearn.svm import SVR
-# param_grid_svr = {'C': [1, 10, 100], 'kernel': ['linear', 'rbf']}
-#
-# model_configs = [
-#     {'name': 'RandomForestRegressor', 'estimator': RandomForestRegressor(random_state=42), 'params': param_grid_rfr},
-#     {'name': 'SVR', 'estimator': SVR(), 'params': param_grid_svr}
-# ]
-
 model_configs = [
     {
         'name': 'RandomForestRegressor',
@@ -64,7 +54,7 @@ model_configs = [
     }
 ]
 
-# --- MODEL TRAINING AND TUNING ---
+#Training
 
 for config in model_configs:
     model_name = config['name']
@@ -90,14 +80,14 @@ for config in model_configs:
     print("Training and tuning complete.")
     print("-" * 30)
 
-    # --- BEST MODEL ---
+    #Best model
     best_model = grid_search.best_estimator_
     print(f"Best parameters for {model_name}:")
     print(grid_search.best_params_)
     print(f"Best cross-validation R² score: {grid_search.best_score_:.4f}")
     print("-" * 30)
 
-    # --- SAVING MODEL ---
+    # Save model iteration
     output_dir = "models"
     os.makedirs(output_dir, exist_ok=True)
     # Save the model with a name that includes the model type
@@ -106,7 +96,7 @@ for config in model_configs:
     print(f"Best model for {model_name} saved to {model_filename}")
     print("-" * 30)
 
-    # --- VALIDATION AND EVALUATION ---
+    #Validation
     print(f"Evaluating {model_name} on the test set...")
     y_pred = best_model.predict(X_test)
 

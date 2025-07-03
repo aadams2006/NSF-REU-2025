@@ -8,10 +8,9 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.inspection import permutation_importance
 import joblib
 
-# --- 1. Data Preparation ---
+# Data Preparation
 
-# Load your data from the CSV file located in the 'data' folder
-# This assumes the script is run from the root of the NSF REU Code Repo
+# Load data assuming the script is run from the root of the repo
 try:
     data_path = os.path.join("data", "all_fiber_data_combined.csv")
     data = pd.read_csv(data_path)    
@@ -22,8 +21,7 @@ except FileNotFoundError:
 # Prepare the data: drop rows with any missing values
 data.dropna(inplace=True)
 
-# Define features (X) and target (y)
-# We want to predict 'Flex Stress (MPa)' based on other measurements.
+# Define features (X) and target (y) to predict 'Flex Stress (MPa)' based on other measurements
 features = ["Crosshead (mm)", "Load (N)", "F Strain (mm/mm)"]
 target = "Flex Stress (MPa)"
 
@@ -41,7 +39,7 @@ print(f"Testing data shape: {X_test.shape}")
 print("-" * 30)
 
 
-# --- 2. Hyperparameter Tuning with Grid Search ---
+#Hyperparameter Tuning with Grid Search
 
 # Create a pipeline that first scales the data, then applies the BPNN (MLPRegressor)
 # Neural Networks are sensitive to feature scaling, so this is a crucial step.
@@ -56,7 +54,7 @@ pipeline = Pipeline([
 ])
 
 # Define the parameter grid to search for the best hyperparameters
-# We will tune the neural network's architecture, activation function, and regularization.
+# Architecture, activation function, and regularization.
 param_grid = {
     'bpnn__hidden_layer_sizes': [(50, 50), (100,), (100, 50)],
     'bpnn__activation': ['relu', 'tanh'],
@@ -78,7 +76,7 @@ grid_search = GridSearchCV(
 )
 
 
-# --- 3. Model Training ---
+# Training
 
 print("Running Grid Search to find the best hyperparameters for the BPNN...")
 # Fit the grid search to the training data
@@ -96,7 +94,7 @@ print(grid_search.best_params_)
 print("-" * 30)
 
 
-# --- 4. Evaluation/Validation ---
+# Evaluation/Validation
 
 # Use the best trained pipeline to make predictions on the test set
 # The pipeline automatically applies the same scaling to the test data
@@ -111,7 +109,8 @@ print(f"Mean Squared Error (MSE): {mse:.4f}")
 print(f"R-squared (R²) Score: {r2:.4f}")
 print("-" * 30)
 
-# --- 5. Feature Importance ---
+# Feature Importance
+
 # For models like MLPRegressor, a direct `feature_importances_` attribute is not
 # available. We use permutation importance instead, which is a model-agnostic
 # method to evaluate how much each feature contributes to the model's accuracy.
@@ -127,7 +126,7 @@ print(importances.sort_values(ascending=False))
 print("-" * 30)
 
 
-# --- 6. Saving Model ---
+# Save model
 output_dir = "models"
 os.makedirs(output_dir, exist_ok=True)
 model_filename = os.path.join(output_dir, "bpnn_model.joblib")

@@ -3,7 +3,7 @@ import glob
 import os
 import re
 
-# --- Find all Excel files in the directory ---
+# Find all Excel files in the directory
 excel_files = glob.glob(os.path.join("data", "*.xlsx"))
 if not excel_files:
     print("Error: No '.xlsx' files found in the 'data' directory.")
@@ -11,7 +11,7 @@ if not excel_files:
 
 print(f"Found {len(excel_files)} Excel file(s) to process: {excel_files}")
 
-# --- PARAMETERS ---
+# PARAMETERS
 # Data starts at Row 11 (index 10).
 # Columns: E-H (starts at index 4), I-L (starts at index 8), and so on.
 # The step between the start of each specimen block is 4 columns.
@@ -22,7 +22,7 @@ DATA_START_ROW = 10  # Row 11 in Excel is index 10
 # Initialize list to collect all dataframes from all files
 all_data = []
 
-# --- DATA EXTRACTION ---
+# DATA EXTRACTION
 # Loop through each found Excel file
 for excel_file in excel_files:
     print(f"\n--- Processing file: '{excel_file}' ---")
@@ -76,7 +76,7 @@ for excel_file in excel_files:
                 print(f"    - Error processing Specimen {specimen_num} in sheet '{sheet_name}': {e}")
 
 
-# --- COMBINE, CLEAN, AND SAVE ---
+# COMBINE, CLEAN, AND SAVE
 if all_data:
     # Combine all collected dataframes
     df_final = pd.concat(all_data, ignore_index=True)

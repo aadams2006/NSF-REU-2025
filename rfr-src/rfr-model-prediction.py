@@ -2,7 +2,6 @@ import pandas as pd
 import joblib
 import os
 
-# --- MODEL LOADING ---
 
 # Updated to load the model saved by the new training script
 MODEL_NAME = 'randomforestregressor'  # Corresponds to config['name'].lower() in training script
@@ -22,7 +21,7 @@ def load_model(path):
         print(f"An error occurred while loading the model: {e}")
         return None
 
-# --- PREDICTION ---
+#PREDICTION
 
 def predict_stress(model, input_data):
     """
@@ -45,7 +44,7 @@ def predict_stress(model, input_data):
         print(f"An error occurred during prediction: {e}")
         return None
 
-# --- SCRIPT EXECUTION ---
+#Running script
 
 def main():
     """Main function to run the prediction script."""
