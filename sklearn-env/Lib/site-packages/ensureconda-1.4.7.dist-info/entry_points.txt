@@ -1,0 +1,2 @@
+[console_scripts]
+ensureconda = ensureconda.cli:ensureconda_cli

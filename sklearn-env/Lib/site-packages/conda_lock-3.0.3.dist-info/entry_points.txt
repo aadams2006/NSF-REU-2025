@@ -1,0 +1,2 @@
+[console_scripts]
+conda-lock = conda_lock:main

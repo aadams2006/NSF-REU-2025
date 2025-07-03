@@ -1,0 +1,4 @@
+Model Evaluation:
+Mean Squared Error (MSE): 1.8807
+R-squared (R²) Score: 0.9996
+----------------------------------

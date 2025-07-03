@@ -1,0 +1,21 @@
+Model Evaluation:
+Mean Squared Error (MSE): 6.0601
+R-squared (R²) Score: 0.9988
+------------------------------
+Feature Importances:
+Load (N)            0.768752
+F Strain (mm/mm)    0.123402
+Crosshead (mm)      0.107846
+dtype: float64
+------------------------------
+
+Post Grid Search:
+Mean Squared Error (MSE): 5.8038
+R-squared (R²) Score: 0.9988
+------------------------------
+Feature Importances:
+Load (N)            0.768534
+F Strain (mm/mm)    0.122959
+Crosshead (mm)      0.108507
+dtype: float64
+------------------------------
