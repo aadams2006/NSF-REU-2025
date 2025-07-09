@@ -60,7 +60,7 @@ with open(report_filename, 'a') as report_file:
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     report_file.write(f"--- Results for {model_name} generated on {timestamp} ---\n\n")
 
-    # --- Pre-optimization evaluation ---
+    # Pre-optimization evaluation
     print(f"--- Evaluating default {model_name} (pre-optimization) ---")
     default_model = KNeighborsRegressor(n_jobs=-1)
     default_model.fit(X_train, y_train)
@@ -78,7 +78,7 @@ with open(report_filename, 'a') as report_file:
     report_file.write(f"  Mean Squared Error (MSE): {mse_default:.4f}\n")
     report_file.write(f"  R-squared (R²) Score: {r2_default:.4f}\n\n")
 
-    # --- Hyperparameter Tuning ---
+    # Hyperparameter Tuning
     print(f"--- Tuning hyperparameters for {model_name} ---")
     grid_search = GridSearchCV(
         estimator=knn,
@@ -108,7 +108,7 @@ with open(report_filename, 'a') as report_file:
     print(f"Best model for {model_name} saved to {model_filename}")
     print("-" * 30)
 
-    # --- Post-optimization evaluation ---
+    # Post-optimization evaluation
     print(f"--- Evaluating {model_name} on the test set (post-optimization) ---")
     y_pred = best_knn.predict(X_test)
 
