@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import datetime
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error, r2_score
@@ -37,66 +38,92 @@ print(f"Training data shape: {X_train.shape}")
 print(f"Testing data shape: {X_test.shape}")
 print("-" * 30)
 
-
-#Hyperparameter Tuning with Grid Search
-
-# Create a K-Nearest Neighbors Regressor model instance
+# MODEL AND HYPERPARAMETER CONFIGURATION
+model_name = 'KNeighborsRegressor'
 knn = KNeighborsRegressor(n_jobs=-1)
 
-# Define the parameter grid to search
-# We'll search for the best number of neighbors, weight function, and distance metric.
 param_grid = {
-    'n_neighbors': range(1, 31),  # Test k from 1 to 30
+    'n_neighbors': range(1, 31),
     'weights': ['uniform', 'distance'],
     'metric': ['euclidean', 'manhattan', 'minkowski']
 }
 
-# Create a GridSearchCV object
-# cv=5 means 5-fold cross-validation.
-# scoring='r2' will optimize for the best R-squared score.
-grid_search = GridSearchCV(
-    estimator=knn,
-    param_grid=param_grid,
-    cv=5,
-    scoring='r2',
-    verbose=1  # To see the progress
-)
+# Create reports directory
+reports_dir = "reports"
+os.makedirs(reports_dir, exist_ok=True)
+report_filename = os.path.join(reports_dir, "knn_evaluation.txt")
 
+# Open the report file to write the results
+with open(report_filename, 'a') as report_file:
+    report_file.write(f"Evaluation Report generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+    
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    report_file.write(f"--- Results for {model_name} generated on {timestamp} ---\n\n")
 
-#Model Training
+    # --- Pre-optimization evaluation ---
+    print(f"--- Evaluating default {model_name} (pre-optimization) ---")
+    default_model = KNeighborsRegressor(n_jobs=-1)
+    default_model.fit(X_train, y_train)
+    y_pred_default = default_model.predict(X_test)
+    
+    mse_default = mean_squared_error(y_test, y_pred_default)
+    r2_default = r2_score(y_test, y_pred_default)
 
-print("Running Grid Search to find the best hyperparameters...")
-# Fit the grid search to the training data
-grid_search.fit(X_train, y_train)
-print("Grid Search complete.")
-print("-" * 30)
+    print("Default Model Evaluation:")
+    print(f"Mean Squared Error (MSE): {mse_default:.4f}")
+    print(f"R-squared (R²) Score: {r2_default:.4f}")
+    print("-" * 30)
 
-# Get the best model from the grid search
-best_knn = grid_search.best_estimator_
+    report_file.write("Default Model (pre-optimization):\n")
+    report_file.write(f"  Mean Squared Error (MSE): {mse_default:.4f}\n")
+    report_file.write(f"  R-squared (R²) Score: {r2_default:.4f}\n\n")
 
-# Print the best parameters found
-print("Best Hyperparameters Found:")
-print(grid_search.best_params_)
-print("-" * 30)
+    # --- Hyperparameter Tuning ---
+    print(f"--- Tuning hyperparameters for {model_name} ---")
+    grid_search = GridSearchCV(
+        estimator=knn,
+        param_grid=param_grid,
+        cv=5,
+        scoring='r2',
+        verbose=1
+    )
 
+    print(f"Training and tuning {model_name}...")
+    grid_search.fit(X_train, y_train)
+    print("Training and tuning complete.")
+    print("-" * 30)
 
-#Model Evaluation
+    #Best model
+    best_knn = grid_search.best_estimator_
+    print(f"Best parameters for {model_name}:")
+    print(grid_search.best_params_)
+    print(f"Best cross-validation R² score: {grid_search.best_score_:.4f}")
+    print("-" * 30)
 
-#Use the best model to make predictions on the test set
-y_pred = best_knn.predict(X_test)
+    # Save model iteration
+    output_dir = "models"
+    os.makedirs(output_dir, exist_ok=True)
+    model_filename = os.path.join(output_dir, "knn_model.joblib")
+    joblib.dump(best_knn, model_filename)
+    print(f"Best model for {model_name} saved to {model_filename}")
+    print("-" * 30)
 
-#Calculate the Mean Squared Error and R-squared score
-mse = mean_squared_error(y_test, y_pred)
-r2 = r2_score(y_test, y_pred)
+    # --- Post-optimization evaluation ---
+    print(f"--- Evaluating {model_name} on the test set (post-optimization) ---")
+    y_pred = best_knn.predict(X_test)
 
-print("Evaluation of the Best Model:")
-print(f"Mean Squared Error (MSE): {mse:.4f}")
-print(f"R-squared (R²) Score: {r2:.4f}")
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
 
-#Saving the best model
-output_dir = "models"
-os.makedirs(output_dir, exist_ok=True)  # Ensure the directory exists
-model_filename = os.path.join(output_dir, "knn_model.joblib")
-joblib.dump(best_knn, model_filename)
-print(f"\nBest model saved to {model_filename}")
-print("-" * 30)
+    print("Optimized Model Evaluation:")
+    print(f"Mean Squared Error (MSE): {mse:.4f}")
+    print(f"R-squared (R²) Score: {r2:.4f}")
+    print("-" * 30)
+
+    report_file.write("Optimized Model (post-GridSearchCV):\n")
+    report_file.write(f"  Best Parameters: {grid_search.best_params_}\n")
+    report_file.write(f"  Best cross-validation R² score: {grid_search.best_score_:.4f}\n")
+    report_file.write(f"  Test Set MSE: {mse:.4f}\n")
+    report_file.write(f"  Test Set R² Score: {r2:.4f}\n\n")
+
+print(f"Evaluation report saved to {report_filename}")
