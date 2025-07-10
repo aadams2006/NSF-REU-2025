@@ -1,6 +1,11 @@
 import pandas as pd
 import joblib
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import make_pipeline
 
 #LOAD THE TRAINED MODEL
 
@@ -49,30 +54,54 @@ def predict_stress(model, input_data):
 
 def main():
     """Main function to run the prediction script."""
-    # Load the model
+    # Load the trained KNN model
     knn_model = load_model(MODEL_PATH)
 
     if knn_model:
-        # Create new data points as a pandas DataFrame.
-        # Column names must EXACTLY match the 'features' used for training.
-        new_data_to_predict = pd.DataFrame({
-            "Crosshead (mm)": [1.5, 2.0],
-            "Load (N)": [180, 250],
-            "F Strain (mm/mm)": [0.022, 0.030]
+        # Load dataset to fit empirical relationships
+        df = pd.read_csv("data/all_fiber_data_combined.csv")
+        df.dropna(subset=["Crosshead (mm)", "Load (N)", "F Strain (mm/mm)"], inplace=True)
+
+        # Fit Polynomial models for smoother relationships
+        X_strain = df[["F Strain (mm/mm)"]]
+        degree = 3  # Degree of the polynomial
+        load_model_fit = make_pipeline(PolynomialFeatures(degree), LinearRegression())
+        load_model_fit.fit(X_strain, df["Load (N)"])
+        crosshead_model = make_pipeline(PolynomialFeatures(degree), LinearRegression())
+        crosshead_model.fit(X_strain, df["Crosshead (mm)"])
+
+        # Generate strain values to predict over
+        strain_values = np.linspace(0, 0.05, 500).reshape(-1, 1)
+        load_values = load_model_fit.predict(strain_values)
+        crosshead_values = crosshead_model.predict(strain_values)
+
+        # Assemble prediction input
+        curve_data_to_predict = pd.DataFrame({
+            "Crosshead (mm)": crosshead_values,
+            "Load (N)": load_values,
+            "F Strain (mm/mm)": strain_values.flatten()
         })
 
-        # Use the loaded model to make predictions
-        predicted_stresses = predict_stress(knn_model, new_data_to_predict)
+        # Predict stress
+        predicted_stresses_curve = predict_stress(knn_model, curve_data_to_predict)
 
-        if predicted_stresses is not None:
-            print("\n" + "-" * 30)
-            print("Prediction on New Data:")
-            print(f"Input Features:\n{new_data_to_predict.to_string(index=False)}\n")
+        if predicted_stresses_curve is not None:
+            # Plot
+            plt.figure(figsize=(10, 6))
+            plt.plot(strain_values, predicted_stresses_curve, label='Predicted Stress-Strain Curve', color='blue')
+            plt.title('Predicted Stress-Strain Curve (Polynomial Inputs)')
+            plt.xlabel('F Strain (mm/mm)')
+            plt.ylabel('Predicted Flex Stress (MPa)')
+            plt.legend()
+            plt.grid(True)
 
-            for i, prediction in enumerate(predicted_stresses):
-                print(f"Prediction for sample {i+1}:")
-                print(f"Predicted Flex Stress (MPa): {prediction:.4f}")
-            print("-" * 30)
+            # Save
+            reports_dir = "reports"
+            os.makedirs(reports_dir, exist_ok=True)
+            plot_filename = os.path.join(reports_dir, "knn_predicted_curve.png")
+            plt.savefig(plot_filename)
+            print(f"Plot saved to {plot_filename}")
+            plt.show()
 
 
 if __name__ == "__main__":
