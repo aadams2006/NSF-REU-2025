@@ -1,57 +1,15 @@
-Evaluation Report generated on: 2025-07-09 10:33:56
+Evaluation Report generated on: 2025-07-14 11:08:09
 
---- Results for BPNN (MLPRegressor) generated on 2025-07-09 10:33:56 ---
+Validation Specimen: 6-Oz, ID 3
 
-Default Model (pre-optimization):
-  Mean Squared Error (MSE): 8.5168
-  R-squared (R²) Score: 0.9983
-
-Optimized Model (post-GridSearchCV):
-  Best Parameters: {'bpnn__activation': 'tanh', 'bpnn__alpha': 0.001, 'bpnn__hidden_layer_sizes': (50, 50), 'bpnn__solver': 'adam'}
-  Best cross-validation R² score: 0.9996
-  Test Set MSE: 0.8601
+--- Optimized Model (post-GridSearchCV) ---
+  Best Parameters: {'bpnn__activation': 'tanh', 'bpnn__alpha': 0.01, 'bpnn__hidden_layer_sizes': (100, 50), 'bpnn__solver': 'adam'}
+  Best cross-validation R² score: 0.9997
+  Test Set MSE: 0.9485
   Test Set R² Score: 0.9998
 
 Feature Importances (for optimized model):
-Crosshead (mm)      3.400010
-F Strain (mm/mm)    2.694265
-Load (N)            2.310637
-
-Evaluation Report generated on: 2025-07-09 10:41:19
-
---- Results for BPNN (MLPRegressor) generated on 2025-07-09 10:41:19 ---
-
-Default Model (pre-optimization):
-  Mean Squared Error (MSE): 8.5168
-  R-squared (R²) Score: 0.9983
-
-Optimized Model (post-GridSearchCV):
-  Best Parameters: {'bpnn__activation': 'tanh', 'bpnn__alpha': 0.001, 'bpnn__hidden_layer_sizes': (50, 50), 'bpnn__solver': 'adam'}
-  Best cross-validation R² score: 0.9996
-  Test Set MSE: 0.8601
-  Test Set R² Score: 0.9998
-
-Feature Importances (for optimized model):
-Crosshead (mm)      3.400010
-F Strain (mm/mm)    2.694265
-Load (N)            2.310637
-
-Evaluation Report generated on: 2025-07-10 10:59:21
-
---- Results for BPNN (MLPRegressor) generated on 2025-07-10 10:59:21 ---
-
-Default Model (pre-optimization):
-  Mean Squared Error (MSE): 8.5168
-  R-squared (R²) Score: 0.9983
-
-Optimized Model (post-GridSearchCV):
-  Best Parameters: {'bpnn__activation': 'tanh', 'bpnn__alpha': 0.001, 'bpnn__hidden_layer_sizes': (50, 50), 'bpnn__solver': 'adam'}
-  Best cross-validation R² score: 0.9996
-  Test Set MSE: 0.8601
-  Test Set R² Score: 0.9998
-
-Feature Importances (for optimized model):
-Crosshead (mm)      3.400010
-F Strain (mm/mm)    2.694265
-Load (N)            2.310637
+Crosshead (mm)      3.405213
+F Strain (mm/mm)    2.908353
+Load (N)            2.406620
 

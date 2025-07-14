@@ -1,14 +1,10 @@
-Evaluation Report generated on: 2025-07-09 10:38:01
+Evaluation Report generated on: 2025-07-14 11:12:57
 
---- Results for KNeighborsRegressor generated on 2025-07-09 10:38:01 ---
+Validation Specimen: 6-Oz, ID 3
 
-Default Model (pre-optimization):
-  Mean Squared Error (MSE): 197.9290
-  R-squared (R²) Score: 0.9605
-
-Optimized Model (post-GridSearchCV):
+--- Optimized Model (post-GridSearchCV) ---
   Best Parameters: {'metric': 'manhattan', 'n_neighbors': 4, 'weights': 'distance'}
-  Best cross-validation R² score: 0.9721
-  Test Set MSE: 150.9460
-  Test Set R² Score: 0.9699
+  Best cross-validation R² score: 0.9680
+  Test Set MSE: 146.7425
+  Test Set R² Score: 0.9690
 
