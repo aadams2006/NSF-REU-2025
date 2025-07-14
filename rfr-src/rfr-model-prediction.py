@@ -3,13 +3,13 @@ import joblib
 import os
 import matplotlib.pyplot as plt
 
-# --- CONFIGURATION ---
+# CONFIGURATION
 MODEL_NAME = 'randomforestregressor'
 MODEL_PATH = os.path.join("models", f"{MODEL_NAME}_model.joblib")
 VALIDATION_SET_PATH = os.path.join("data", "validation", "rfr_validation_set.csv")
 REPORTS_DIR = "reports"
 
-# --- FUNCTION DEFINITIONS ---
+# FUNCTION DEFINITIONS
 
 def load_model(path):
     """Loads a trained model from a file."""
@@ -38,7 +38,7 @@ def predict_stress(model, input_data):
     features = ["Crosshead (mm)", "Load (N)", "F Strain (mm/mm)"]
     return model.predict(input_data[features])
 
-# --- MAIN EXECUTION ---
+# MAIN EXECUTION
 
 def main():
     """Main function to run the prediction and plotting script."""

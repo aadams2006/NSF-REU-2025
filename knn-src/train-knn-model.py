@@ -13,7 +13,7 @@ MODELS_DIR = "models"
 VALIDATION_DATA_DIR = os.path.join("data", "validation")
 MODEL_NAME = 'KNeighborsRegressor'
 
-# --- DATA LOADING & PREPARATION ---
+# DATA LOADING & PREPARATION 
 try:
     data = pd.read_csv(DATA_PATH)
     print("File loaded.")
@@ -23,7 +23,7 @@ except FileNotFoundError:
 
 data.dropna(inplace=True)
 
-# --- VALIDATION SET CREATION ---
+# VALIDATION SET CREATION 
 VALIDATION_FIBER_OZ = '6-Oz'
 VALIDATION_SPECIMEN_ID = 3
 
@@ -43,7 +43,7 @@ os.makedirs(VALIDATION_DATA_DIR, exist_ok=True)
 validation_set.to_csv(os.path.join(VALIDATION_DATA_DIR, "knn_validation_set.csv"), index=False)
 print(f"Validation set saved to {os.path.join(VALIDATION_DATA_DIR, 'knn_validation_set.csv')}")
 
-# --- FEATURE ENGINEERING ---
+# FEATURE ENGINEERING 
 features = ["Crosshead (mm)", "Load (N)", "F Strain (mm/mm)"]
 target = "Flex Stress (MPa)"
 
@@ -56,7 +56,7 @@ print(f"Training data shape: {X_train.shape}")
 print(f"Testing data shape: {X_test.shape}")
 print("-" * 30)
 
-# --- MODEL TRAINING & HYPERPARAMETER TUNING ---
+# MODEL TRAINING & HYPERPARAMETER TUNING 
 param_grid = {
     'n_neighbors': range(1, 31),
     'weights': ['uniform', 'distance'],
@@ -77,13 +77,13 @@ print("Training and tuning complete.")
 
 best_knn = grid_search.best_estimator_
 
-# --- SAVE THE TRAINED MODEL ---
+# SAVE THE TRAINED MODEL
 os.makedirs(MODELS_DIR, exist_ok=True)
 model_filename = os.path.join(MODELS_DIR, "knn_model.joblib")
 joblib.dump(best_knn, model_filename)
 print(f"Best model saved to {model_filename}")
 
-# --- EVALUATION & REPORTING ---
+# EVALUATION & REPORTING
 y_pred = best_knn.predict(X_test)
 mse = mean_squared_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)

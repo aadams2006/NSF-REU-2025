@@ -7,14 +7,14 @@ import os
 import datetime
 import joblib
 
-# --- CONFIGURATION ---
+# CONFIGURATION 
 DATA_PATH = os.path.join("data", "all_fiber_data_combined.csv")
 REPORTS_DIR = "reports"
 MODELS_DIR = "models"
 VALIDATION_DATA_DIR = os.path.join("data", "validation")
 MODEL_NAME = 'RandomForestRegressor'
 
-# --- DATA LOADING & PREPARATION ---
+# DATA LOADING & PREPARATION
 try:
     data = pd.read_csv(DATA_PATH)
     print("File loaded.")
@@ -24,9 +24,9 @@ except FileNotFoundError:
 
 data.dropna(inplace=True)
 
-# --- VALIDATION SET CREATION ---
+# VALIDATION SET CREATION
 # Identify a complete specimen to hold out for validation
-# Let's choose a specimen from the middle of the dataset, e.g., '6-Oz', specimen 3
+# Choose a specimen from the middle of the dataset, '6-Oz', specimen 3
 VALIDATION_FIBER_OZ = '6-Oz'
 VALIDATION_SPECIMEN_ID = 3
 
@@ -47,7 +47,7 @@ os.makedirs(VALIDATION_DATA_DIR, exist_ok=True)
 validation_set.to_csv(os.path.join(VALIDATION_DATA_DIR, "rfr_validation_set.csv"), index=False)
 print(f"Validation set saved to {os.path.join(VALIDATION_DATA_DIR, 'rfr_validation_set.csv')}")
 
-# --- FEATURE ENGINEERING ---
+# FEATURE ENGINEERING 
 features = ["Crosshead (mm)", "Load (N)", "F Strain (mm/mm)"]
 target = "Flex Stress (MPa)"
 
@@ -61,7 +61,7 @@ print(f"Training data shape: {X_train.shape}")
 print(f"Testing data shape: {X_test.shape}")
 print("-" * 30)
 
-# --- MODEL TRAINING & HYPERPARAMETER TUNING ---
+# MODEL TRAINING & HYPERPARAMETER TUNING
 param_grid_rfr = {
     'n_estimators': [100, 150],
     'max_depth': [10, 20, None],
@@ -84,13 +84,13 @@ print("Training and tuning complete.")
 
 best_model = grid_search.best_estimator_
 
-# --- SAVE THE TRAINED MODEL ---
+# SAVE THE TRAINED MODEL 
 os.makedirs(MODELS_DIR, exist_ok=True)
 model_filename = os.path.join(MODELS_DIR, f"{MODEL_NAME.lower()}_model.joblib")
 joblib.dump(best_model, model_filename)
 print(f"Best model saved to {model_filename}")
 
-# --- EVALUATION & REPORTING ---
+# EVALUATION & REPORTING 
 y_pred = best_model.predict(X_test)
 mse = mean_squared_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
