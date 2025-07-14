@@ -1,0 +1,21 @@
+Refactor model evaluation to use hold-out validation for more accurate and sensical stress-strain curve predictions.
+
+Previously, the prediction scripts either generated synthetic data or plotted a mix of test points, resulting in misleading or nonsensical graphs. This change implements a consistent and robust hold-out validation strategy across all models (RFR, KNN, BPNN) to provide an honest assessment of their predictive performance.
+
+Key Changes:
+
+-   **Hold-Out Validation Set:**
+    -   The training scripts (`train-rfr-model.py`, `train-knn-model.py`, `train-bpnn-model.py`) now isolate a complete specimen ('6-Oz', Specimen 3) as a pure validation set *before* any training occurs.
+    -   This validation set is saved to its own file in the `data/validation/` directory and is never seen by the model during training or hyperparameter tuning.
+
+-   **Training on Remaining Data:**
+    -   The models are now trained on all data *except* for the held-out validation specimen.
+
+-   **Honest Prediction and Plotting:**
+    -   The prediction scripts (`rfr-model-prediction.py`, `knn-model-prediction.py`, `bpnn-model-prediction.py`) now load the trained model and the corresponding hold-out validation set.
+    -   They predict the stress-strain curve for the validation specimen's real, unseen input data.
+    -   The resulting plot now accurately compares the model's predicted curve against the true, actual curve for the validation specimen, providing a clear and honest visualization of the model's generalization performance.
+
+-   **New Output Files:**
+    -   The new plots are saved with descriptive names (e.g., `rfr_hold_out_validation_curve.png`) in the `reports` directory.
+    -   The validation data for each model is saved in the `data/validation/` directory.

@@ -6,124 +6,101 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 
-#Data Preparation
+# --- CONFIGURATION ---
+DATA_PATH = os.path.join("data", "all_fiber_data_combined.csv")
+REPORTS_DIR = "reports"
+MODELS_DIR = "models"
+VALIDATION_DATA_DIR = os.path.join("data", "validation")
+MODEL_NAME = 'KNeighborsRegressor'
 
-# Load your data from the CSV file located in the 'data' folder
+# --- DATA LOADING & PREPARATION ---
 try:
-    data_path = os.path.join("data", "all_fiber_data_combined.csv")
-    data = pd.read_csv(data_path)
-    print(f"Successfully loaded '{data_path}'.")
+    data = pd.read_csv(DATA_PATH)
+    print("File loaded.")
 except FileNotFoundError:
-    print(f"Error: '{data_path}' not found. Make sure you have run aggregated-data.py first.")
+    print(f"Error: Data file not found at {DATA_PATH}")
     exit()
 
-# Prepare the data: drop rows with any missing values
 data.dropna(inplace=True)
 
-# Define features (X) and target (y)
-# We want to predict 'Flex Stress (MPa)' based on other measurements.
+# --- VALIDATION SET CREATION ---
+VALIDATION_FIBER_OZ = '6-Oz'
+VALIDATION_SPECIMEN_ID = 3
+
+validation_mask = (data['Fiber_Oz'] == VALIDATION_FIBER_OZ) & (data['Specimen_ID'] == VALIDATION_SPECIMEN_ID)
+validation_set = data[validation_mask]
+training_data = data[~validation_mask]
+
+if validation_set.empty:
+    print("Error: Could not find the specified validation specimen. Please check the IDs.")
+    exit()
+
+print(f"Holding out specimen ({VALIDATION_FIBER_OZ}, {VALIDATION_SPECIMEN_ID}) for validation.")
+print(f"Training data size: {len(training_data)}")
+print(f"Validation data size: {len(validation_set)}")
+
+os.makedirs(VALIDATION_DATA_DIR, exist_ok=True)
+validation_set.to_csv(os.path.join(VALIDATION_DATA_DIR, "knn_validation_set.csv"), index=False)
+print(f"Validation set saved to {os.path.join(VALIDATION_DATA_DIR, 'knn_validation_set.csv')}")
+
+# --- FEATURE ENGINEERING ---
 features = ["Crosshead (mm)", "Load (N)", "F Strain (mm/mm)"]
 target = "Flex Stress (MPa)"
 
-X = data[features]
-y = data[target]
+X = training_data[features]
+y = training_data[target]
 
-# Split the data into training and testing sets
-# 80% for training, 20% for testing
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 print(f"Training data shape: {X_train.shape}")
 print(f"Testing data shape: {X_test.shape}")
 print("-" * 30)
 
-# MODEL AND HYPERPARAMETER CONFIGURATION
-model_name = 'KNeighborsRegressor'
-knn = KNeighborsRegressor(n_jobs=-1)
-
+# --- MODEL TRAINING & HYPERPARAMETER TUNING ---
 param_grid = {
     'n_neighbors': range(1, 31),
     'weights': ['uniform', 'distance'],
     'metric': ['euclidean', 'manhattan', 'minkowski']
 }
 
-# Create reports directory
-reports_dir = "reports"
-os.makedirs(reports_dir, exist_ok=True)
-report_filename = os.path.join(reports_dir, "knn_evaluation.txt")
+grid_search = GridSearchCV(
+    estimator=KNeighborsRegressor(n_jobs=-1),
+    param_grid=param_grid,
+    cv=5,
+    scoring='r2',
+    verbose=1
+)
 
-# Open the report file to write the results
-with open(report_filename, 'a') as report_file:
+print(f"Training and tuning {MODEL_NAME}...")
+grid_search.fit(X_train, y_train)
+print("Training and tuning complete.")
+
+best_knn = grid_search.best_estimator_
+
+# --- SAVE THE TRAINED MODEL ---
+os.makedirs(MODELS_DIR, exist_ok=True)
+model_filename = os.path.join(MODELS_DIR, "knn_model.joblib")
+joblib.dump(best_knn, model_filename)
+print(f"Best model saved to {model_filename}")
+
+# --- EVALUATION & REPORTING ---
+y_pred = best_knn.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print("\n--- Optimized Model Evaluation on Test Set ---")
+print(f"Mean Squared Error (MSE): {mse:.4f}")
+print(f"R-squared (R²) Score: {r2:.4f}")
+
+os.makedirs(REPORTS_DIR, exist_ok=True)
+report_filename = os.path.join(REPORTS_DIR, "knn_evaluation.txt")
+with open(report_filename, 'w') as report_file:
     report_file.write(f"Evaluation Report generated on: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
-    
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    report_file.write(f"--- Results for {model_name} generated on {timestamp} ---\n\n")
-
-    # Pre-optimization evaluation
-    print(f"--- Evaluating default {model_name} (pre-optimization) ---")
-    default_model = KNeighborsRegressor(n_jobs=-1)
-    default_model.fit(X_train, y_train)
-    y_pred_default = default_model.predict(X_test)
-    
-    mse_default = mean_squared_error(y_test, y_pred_default)
-    r2_default = r2_score(y_test, y_pred_default)
-
-    print("Default Model Evaluation:")
-    print(f"Mean Squared Error (MSE): {mse_default:.4f}")
-    print(f"R-squared (R²) Score: {r2_default:.4f}")
-    print("-" * 30)
-
-    report_file.write("Default Model (pre-optimization):\n")
-    report_file.write(f"  Mean Squared Error (MSE): {mse_default:.4f}\n")
-    report_file.write(f"  R-squared (R²) Score: {r2_default:.4f}\n\n")
-
-    # Hyperparameter Tuning
-    print(f"--- Tuning hyperparameters for {model_name} ---")
-    grid_search = GridSearchCV(
-        estimator=knn,
-        param_grid=param_grid,
-        cv=5,
-        scoring='r2',
-        verbose=1
-    )
-
-    print(f"Training and tuning {model_name}...")
-    grid_search.fit(X_train, y_train)
-    print("Training and tuning complete.")
-    print("-" * 30)
-
-    #Best model
-    best_knn = grid_search.best_estimator_
-    print(f"Best parameters for {model_name}:")
-    print(grid_search.best_params_)
-    print(f"Best cross-validation R² score: {grid_search.best_score_:.4f}")
-    print("-" * 30)
-
-    # Save model iteration
-    output_dir = "models"
-    os.makedirs(output_dir, exist_ok=True)
-    model_filename = os.path.join(output_dir, "knn_model.joblib")
-    joblib.dump(best_knn, model_filename)
-    print(f"Best model for {model_name} saved to {model_filename}")
-    print("-" * 30)
-
-    # Post-optimization evaluation
-    print(f"--- Evaluating {model_name} on the test set (post-optimization) ---")
-    y_pred = best_knn.predict(X_test)
-
-    mse = mean_squared_error(y_test, y_pred)
-    r2 = r2_score(y_test, y_pred)
-
-    print("Optimized Model Evaluation:")
-    print(f"Mean Squared Error (MSE): {mse:.4f}")
-    print(f"R-squared (R²) Score: {r2:.4f}")
-    print("-" * 30)
-
-    report_file.write("Optimized Model (post-GridSearchCV):\n")
+    report_file.write(f"Validation Specimen: {VALIDATION_FIBER_OZ}, ID {VALIDATION_SPECIMEN_ID}\n\n")
+    report_file.write("--- Optimized Model (post-GridSearchCV) ---\n")
     report_file.write(f"  Best Parameters: {grid_search.best_params_}\n")
     report_file.write(f"  Best cross-validation R² score: {grid_search.best_score_:.4f}\n")
     report_file.write(f"  Test Set MSE: {mse:.4f}\n")
     report_file.write(f"  Test Set R² Score: {r2:.4f}\n\n")
 
-print(f"Evaluation report saved to {report_filename}")
+print(f"\nEvaluation report saved to {report_filename}")

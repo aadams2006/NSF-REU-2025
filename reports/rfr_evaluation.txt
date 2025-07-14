@@ -1,19 +1,14 @@
-Evaluation Report generated on: 2025-07-09 10:38:58
+Evaluation Report generated on: 2025-07-14 10:32:09
 
---- Results for RandomForestRegressor generated on 2025-07-09 10:38:58 ---
+Validation Specimen: 6-Oz, ID 3
 
-Default Model (pre-optimization):
-  Mean Squared Error (MSE): 6.0601
-  R-squared (R²) Score: 0.9988
-
-Optimized Model (post-GridSearchCV):
-  Best Parameters: {'max_depth': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 150}
+--- Optimized Model (post-GridSearchCV) ---
+  Best Parameters: {'max_depth': 20, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 150}
   Best cross-validation R² score: 0.9992
-  Test Set MSE: 5.8038
-  Test Set R² Score: 0.9988
+  Test Set MSE: 3.0882
+  Test Set R² Score: 0.9993
 
-Feature Importances (for optimized model):
-Load (N)            0.768534
-F Strain (mm/mm)    0.122959
-Crosshead (mm)      0.108507
-
+Feature Importances:
+Load (N)            0.763521
+F Strain (mm/mm)    0.127231
+Crosshead (mm)      0.109249
