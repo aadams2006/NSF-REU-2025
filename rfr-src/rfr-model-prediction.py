@@ -81,6 +81,16 @@ def main():
     plot_filename = os.path.join(REPORTS_DIR, "rfr_hold_out_validation_curve.png")
     plt.savefig(plot_filename)
     print(f"Plot for validation specimen saved to {plot_filename}")
+
+    # 5. Create and Save a table with the results
+    results_df = pd.DataFrame({
+        'Actual Values': plot_data['Flex Stress (MPa)'],
+        'RFR Predicted Values': plot_data['Predicted_Stress']
+    })
+    results_filename = os.path.join(REPORTS_DIR, "rfr_actual_vs_predicted.csv")
+    results_df.to_csv(results_filename, index=False)
+    print(f"Results table saved to {results_filename}")
+
     plt.show()
 
 if __name__ == "__main__":
