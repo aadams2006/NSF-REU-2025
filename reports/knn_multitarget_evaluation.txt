@@ -1,0 +1,12 @@
+Evaluation Report generated on: 2025-07-16 10:52:06
+
+Validation Specimen: 6-Oz, ID 3
+
+--- Optimized Model (post-GridSearchCV) ---
+  Best Parameters: {'metric': 'manhattan', 'n_neighbors': 4, 'weights': 'distance'}
+  Best cross-validation R² score: 0.9754
+  Test Set Stress MSE: 160.6539
+  Test Set Stress R² Score: 0.9661
+  Test Set Strain MSE: 0.0000
+  Test Set Strain R² Score: 0.9861
+

@@ -1,0 +1,17 @@
+Evaluation Report generated on: 2025-07-16 11:11:01
+
+Validation Specimen: 6-Oz, ID 3
+
+--- Optimized Model (post-GridSearchCV) ---
+  Best Parameters: {'max_depth': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 150}
+  Best cross-validation R² score: 0.9181
+  Test Set Stress MSE: 0.0003
+  Test Set Stress R² Score: 1.0000
+  Test Set Strain MSE: 0.0000
+  Test Set Strain R² Score: 0.8616
+
+Feature Importances:
+Flex Stress (MPa)    9.999971e-01
+F Strain (mm/mm)     1.579029e-06
+Crosshead (mm)       8.367935e-07
+Load (N)             5.075258e-07
