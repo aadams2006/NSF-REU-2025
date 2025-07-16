@@ -15,3 +15,10 @@ Flex Stress (MPa)    9.999971e-01
 F Strain (mm/mm)     1.579029e-06
 Crosshead (mm)       8.367935e-07
 Load (N)             5.075258e-07
+
+
+Evaluation Report generated on: 2025-07-16 13:56:19
+Best Parameters: {'max_depth': 10, 'max_features': 'log2', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 200}
+Best Cross-Validation R2 Score: -0.2685
+Test Set R2 Score (Stress): 0.1085
+Test Set R2 Score (Strain): 0.5718

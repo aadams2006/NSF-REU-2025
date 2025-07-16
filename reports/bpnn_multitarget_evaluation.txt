@@ -1,16 +1,25 @@
-Evaluation Report generated on: 2025-07-16 10:54:51
+Evaluation Report generated on: 2025-07-16 13:20:49
 
 Validation Specimen: 6-Oz, ID 3
 
 --- Optimized Model (post-GridSearchCV) ---
-  Best Parameters: {'bpnn__activation': 'tanh', 'bpnn__alpha': 0.01, 'bpnn__hidden_layer_sizes': (100,), 'bpnn__solver': 'adam'}
-  Best cross-validation R² score: 0.7838
-  Test Set Stress MSE: 906.1469
-  Test Set Stress R² Score: 0.8088
-  Test Set Strain MSE: 0.0001
-  Test Set Strain R² Score: 0.8283
+  Best Parameters: {'bpnn__activation': 'relu', 'bpnn__alpha': 0.001, 'bpnn__hidden_layer_sizes': (100, 50), 'bpnn__solver': 'adam'}
+  Best cross-validation R² score: 0.9501
+  Test Set Stress MSE: 0.0025
+  Test Set Stress R² Score: 1.0000
+  Test Set Strain MSE: 0.0000
+  Test Set Strain R² Score: 0.9274
 
 Feature Importances (for optimized model):
-Crosshead (mm)    0.867082
-Load (N)          0.864767
+Crosshead (mm)       1.885559
+Flex Stress (MPa)    1.503955
+Load (N)             0.578756
+F Strain (mm/mm)     0.331548
 
+
+
+Evaluation Report generated on: 2025-07-16 14:07:45
+Best Parameters: {'activation': 'relu', 'alpha': 0.0001, 'hidden_layer_sizes': (50,), 'learning_rate': 'constant', 'solver': 'adam'}
+Best Cross-Validation R2 Score: nan
+Test Set R2 Score (Stress): -6.5859
+Test Set R2 Score (Strain): -592805.2440
