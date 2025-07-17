@@ -1,0 +1,8 @@
+Evaluation Report generated on: 2025-07-17 13:50:24
+Model: rnn_multitarget
+
+Preprocessing Parameters:
+  FIXED_LENGTH: 200
+  INPUT_SPLIT: 0.5
+
+Final Test Set R² score: 0.3578

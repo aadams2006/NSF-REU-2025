@@ -1,0 +1,12 @@
+Evaluation Report generated on: 2025-07-17 11:04:15
+Model: bpnn_multitarget_optimized
+
+Preprocessing Parameters:
+  FIXED_LENGTH: 200
+  INPUT_SPLIT: 0.2
+
+Best Parameters from GridSearchCV:
+{'mlp__activation': 'relu', 'mlp__alpha': 0.0001, 'mlp__hidden_layer_sizes': (100, 100), 'mlp__learning_rate': 'adaptive'}
+
+Best cross-validation R² score: nan
+Final Test Set R² score: -824.1855
