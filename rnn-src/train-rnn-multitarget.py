@@ -32,9 +32,9 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 import tensorflow as tf
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Input, Dropout
-from tensorflow.keras.callbacks import EarlyStopping # Import EarlyStopping
+from tensorflow import Sequential
+from tensorflow import LSTM, Dense, Input, Dropout
+from tensorflow import EarlyStopping # Import EarlyStopping
 import joblib
 import os
 from datetime import datetime
