@@ -4,9 +4,10 @@ import joblib
 import os
 import matplotlib.pyplot as plt
 
-# --- Configuration ---
+#Configuration
 MODEL_NAME = 'bpnn_multitarget'
 MODEL_PATH = os.path.join("models", f"{MODEL_NAME}_model.joblib")
+SCALER_PATH = os.path.join("models", f"{MODEL_NAME}_scaler.joblib") # Path for the scaler
 DATA_FILE = 'C:/Users/alexg/Downloads/NSF REU Code Repo/data/all_fiber_data_combined.csv'
 REPORTS_DIR = "reports"
 
@@ -17,23 +18,24 @@ INPUT_SPLIT = 0.2   # Must match the training script's INPUT_SPLIT
 FEATURE_COLS = ['Crosshead (mm)', 'Load (N)', 'Flex Stress (MPa)', 'F Strain (mm/mm)']
 TARGET_COLS = ['Flex Stress (MPa)', 'F Strain (mm/mm)']
 
-# --- Helper Functions ---
+#Helper Functions
 
-def load_model(path):
-    """Loads a trained model from a file."""
+def load_model_and_scaler(model_path, scaler_path):
+    """Loads a trained model and scaler from files."""
     try:
-        model = joblib.load(path)
-        print(f"Model loaded successfully from '{path}'")
-        return model
-    except FileNotFoundError:
-        print(f"Error: Model file not found at '{path}'. Please ensure the model is trained.")
-        return None
+        model = joblib.load(model_path)
+        scaler = joblib.load(scaler_path)
+        print(f"Model and scaler loaded successfully from '{model_path}' and '{scaler_path}'")
+        return model, scaler
+    except FileNotFoundError as e:
+        print(f"Error: File not found. {e}. Please ensure the model and scaler are trained and paths are correct.")
+        return None, None
 
-def preprocess_specimen_data(specimen_df):
+def preprocess_specimen_data(specimen_df, scaler):
     """
     Preprocesses a single specimen's data for prediction.
-    Resamples, splits into input/output parts, and flattens the input.
-    Returns the flattened input features and the actual full curve for plotting.
+    Resamples, splits into input/output parts, scales, and flattens the input.
+    Returns the flattened, scaled input features and the actual full curve for plotting.
     """
     if len(specimen_df) < 2:
         return None, None, None
@@ -49,26 +51,27 @@ def preprocess_specimen_data(specimen_df):
     # Split into input (20%) and target (80%)
     split_idx = int(FIXED_LENGTH * INPUT_SPLIT)
     input_df = resampled_group.iloc[:split_idx]
-    output_df = resampled_group.iloc[split_idx:]
 
     # Flatten input features for model prediction
-    X_flat = input_df[FEATURE_COLS].values.flatten()
+    X_flat = input_df[FEATURE_COLS].values.flatten().reshape(1, -1)
+
+    # Scale the flattened input
+    X_scaled = scaler.transform(X_flat)
 
     # Return the full resampled curve for plotting actuals
     full_actual_stress = resampled_group['Flex Stress (MPa)'].values
     full_actual_strain = resampled_group['F Strain (mm/mm)'].values
 
-    return X_flat, full_actual_stress, full_actual_strain
+    return X_scaled, full_actual_stress, full_actual_strain
 
-def plot_prediction(model, X_flat, full_actual_stress, full_actual_strain, specimen_key):
+def plot_prediction(model, X_scaled, full_actual_stress, full_actual_strain, specimen_key):
     """
     Generates and saves a plot comparing actual vs. predicted stress-strain curves.
     """
     # Predict the flattened continuation
-    y_pred_flat = model.predict(X_flat.reshape(1, -1))[0] # Reshape for single prediction
+    y_pred_flat = model.predict(X_scaled)[0]
 
     num_input_points = int(FIXED_LENGTH * INPUT_SPLIT)
-    num_output_points = FIXED_LENGTH - num_input_points
 
     # Reshape predicted flattened output back to stress and strain
     pred_stress_cont = y_pred_flat[::len(TARGET_COLS)]
@@ -99,14 +102,14 @@ def plot_prediction(model, X_flat, full_actual_stress, full_actual_strain, speci
     plt.close()
     print(f"  Saved prediction plot: {plot_path}")
 
-# --- Main Execution ---
+#Main Execution
 
 def main():
     os.makedirs(REPORTS_DIR, exist_ok=True)
 
-    # Load the trained model
-    model = load_model(MODEL_PATH)
-    if model is None:
+    # Load the trained model and scaler
+    model, scaler = load_model_and_scaler(MODEL_PATH, SCALER_PATH)
+    if model is None or scaler is None:
         return
 
     # Load all data and group by specimen
@@ -121,9 +124,9 @@ def main():
 
     print("Generating predictions and plots for each specimen...")
     for name, group in specimens:
-        X_flat, full_actual_stress, full_actual_strain = preprocess_specimen_data(group)
-        if X_flat is not None:
-            plot_prediction(model, X_flat, full_actual_stress, full_actual_strain, name)
+        X_scaled, full_actual_stress, full_actual_strain = preprocess_specimen_data(group, scaler)
+        if X_scaled is not None:
+            plot_prediction(model, X_scaled, full_actual_stress, full_actual_strain, name)
 
     print("\nPrediction script finished.")
 

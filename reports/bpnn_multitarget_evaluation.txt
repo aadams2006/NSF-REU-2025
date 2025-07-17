@@ -23,3 +23,46 @@ Best Parameters: {'activation': 'relu', 'alpha': 0.0001, 'hidden_layer_sizes': (
 Best Cross-Validation R2 Score: nan
 Test Set R2 Score (Stress): -6.5859
 Test Set R2 Score (Strain): -592805.2440
+
+
+Evaluation Report generated on: 2025-07-17 10:08:29
+Best Parameters: {'activation': 'relu', 'alpha': 0.0001, 'hidden_layer_sizes': (50,), 'learning_rate': 'constant', 'solver': 'adam'}
+Best Cross-Validation R2 Score: nan
+Test Set R2 Score (Stress): -37.6938
+Test Set R2 Score (Strain): -2241.3456
+
+
+Evaluation Report generated on: 2025-07-17 10:10:01
+Best Parameters: {'activation': 'tanh', 'alpha': 0.0001, 'hidden_layer_sizes': (100,), 'learning_rate': 'constant', 'solver': 'adam'}
+Best Cross-Validation R2 Score: -1.2402
+Test Set R2 Score (Stress): -8.3764
+Test Set R2 Score (Strain): -0.9365
+
+
+Evaluation Report generated on: 2025-07-17 10:11:17
+
+
+Evaluation Report generated on: 2025-07-17 10:11:44
+Test Set R2 Score (Stress): -0.6339
+Test Set R2 Score (Strain): -656.1905
+
+
+Evaluation Report generated on: 2025-07-17 10:13:52
+Test Set R2 Score (Stress): -3.0793
+Test Set R2 Score (Strain): -16544.6019
+
+
+Evaluation Report generated on: 2025-07-17 10:17:32
+R2 Score: -3.8774
+
+
+Evaluation Report generated on: 2025-07-17 10:18:38
+R2 Score: -17.1142
+
+
+Evaluation Report generated on: 2025-07-17 10:24:17
+R2 Score: -17.1142
+
+
+Evaluation Report generated on: 2025-07-17 10:25:59
+R2 Score: -16.0604
